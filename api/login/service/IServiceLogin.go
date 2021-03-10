@@ -90,12 +90,18 @@ func (l *StructLogin) One() *result.Result {
 	r := &result.Result{}
 	var model StructLogin
 	if err := db.Where("id = ?", l.ID).First(&model).Error; err != nil {
-		return r.Ok().WidthData(model)
+		return r.Err("")
 	}
-	return r.Err("未查询到结果")
+	return r.Ok().WidthData(model)
 }
-func (l *StructLogin) Page() *result.Result {
-	return nil
+func (l *StructLogin) Page(pageNum int, pageSize int) *result.Result {
+	db := dba.GetDB()
+	r := &result.Result{}
+	var models []StructLogin
+	if err := db.Find(&models).Offset(pageNum*pageSize - 1).Limit(pageSize).Error; err != nil {
+		return r.Err("")
+	}
+	return r.Ok().WidthData(models)
 }
 func (l *StructLogin) Login() *result.Result {
 	db := dba.GetDB()

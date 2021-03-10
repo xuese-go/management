@@ -32,3 +32,9 @@ func TestStructLogin_Login(t *testing.T) {
 	}
 	log.Println("登录成功")
 }
+
+func TestStructLogin_Page(t *testing.T) {
+	model := &StructLogin{}
+	r := model.Page(0, 10)
+	fmt.Println(r)
+}
