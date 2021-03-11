@@ -1,7 +1,8 @@
-package service
+package login
 
 import (
 	"fmt"
+	"github.com/xuese-go/management/api/util/md5"
 	"log"
 	"net/http"
 	"testing"
@@ -9,9 +10,11 @@ import (
 
 func TestStructLogin_Save(t *testing.T) {
 	model := &StructLogin{
-		Acc: "123456",
+		Acc: "123456@qq.com",
 		Pwd: "123456",
 	}
+	pwd := md5.Enc(model.Pwd, model.Acc)
+	model.Pwd = pwd
 	err := model.Save()
 	if err != nil {
 		fmt.Println(err)

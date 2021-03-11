@@ -1,12 +1,12 @@
 package dba
 
 import (
-	"github.com/xuese-go/management/api/login/service"
+	"github.com/xuese-go/management/api/login"
 	"testing"
 )
 
 func TestGetDB(t *testing.T) {
 	db := GetDB()
-	db.AutoMigrate(&service.StructLogin{})
+	db.AutoMigrate(&login.StructLogin{})
 	defer db.Close()
 }

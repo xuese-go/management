@@ -2,10 +2,13 @@
 https://www.bilibili.com/video/BV1U7411V78R?p=6
 */
 
-package service
+package login
 
 import (
+	"fmt"
 	"github.com/jinzhu/gorm"
+	"github.com/xuese-go/management/api/util/jwt"
+	"github.com/xuese-go/management/api/util/md5"
 	"github.com/xuese-go/management/api/util/result"
 	"github.com/xuese-go/management/dba"
 	"log"
@@ -13,9 +16,8 @@ import (
 
 type StructLogin struct {
 	gorm.Model
-	Acc string
-	Pwd string
-	Ta  string
+	Acc string `form:"acc" json:"acc"`
+	Pwd string `form:"pwd" json:"pwd"`
 }
 
 func init() {
@@ -34,18 +36,22 @@ func (l *StructLogin) Save() *result.Result {
 
 	model := StructLogin{}
 	if err := db.Where("acc = ?", l.Acc).First(&model).Error; err != nil {
-		return r.Err("")
+		if err.Error() != "record not found" {
+			return r.Err("")
+		}
 	}
 
 	if model.Acc != "" {
 		return r.Err("账号重复")
 	}
 
+	l.Pwd = md5.Enc("123456", l.Acc)
 	if err := db.Create(&l).Error; err != nil {
 		return r.Err("")
 	}
 	return r.Ok()
 }
+
 func (l *StructLogin) Remove() *result.Result {
 	db := dba.GetDB()
 	r := &result.Result{}
@@ -63,11 +69,12 @@ func (l *StructLogin) Remove() *result.Result {
 	}
 	return r.Ok()
 }
+
 func (l *StructLogin) Update() *result.Result {
 	db := dba.GetDB()
 	r := &result.Result{}
 	var model StructLogin
-	db.First(&model)
+	db.Where("id = ?", l.ID).First(&model)
 
 	//不更新omit中指定的字段
 	//db.Model(&model).Omit("pwd").Update(&l)
@@ -78,6 +85,7 @@ func (l *StructLogin) Update() *result.Result {
 	//	return &err
 	//}
 
+	l.Pwd = md5.Enc(l.Pwd, model.Acc)
 	//只更新select指定的字段
 	if err := db.Model(&model).Select("pwd").Update(&l).Error; err != nil {
 		log.Panicln(err)
@@ -85,6 +93,7 @@ func (l *StructLogin) Update() *result.Result {
 	}
 	return r.Ok()
 }
+
 func (l *StructLogin) One() *result.Result {
 	db := dba.GetDB()
 	r := &result.Result{}
@@ -94,15 +103,24 @@ func (l *StructLogin) One() *result.Result {
 	}
 	return r.Ok().WidthData(model)
 }
+
 func (l *StructLogin) Page(pageNum int, pageSize int) *result.Result {
 	db := dba.GetDB()
 	r := &result.Result{}
 	var models []StructLogin
-	if err := db.Find(&models).Offset(pageNum*pageSize - 1).Limit(pageSize).Error; err != nil {
+	if l.Acc != "" {
+		db = db.Where(fmt.Sprintf(" acc like '%%%s%%' ", l.Acc))
+	}
+	db = db.Omit("pwd")
+	db = db.Find(&models)
+	db = db.Offset((pageNum - 1) * pageSize)
+	db = db.Limit(pageSize)
+	if err := db.Error; err != nil {
 		return r.Err("")
 	}
 	return r.Ok().WidthData(models)
 }
+
 func (l *StructLogin) Login() *result.Result {
 	db := dba.GetDB()
 	r := &result.Result{}
@@ -110,8 +128,13 @@ func (l *StructLogin) Login() *result.Result {
 	if err := db.Where("acc = ?", l.Acc).First(&model).Error; err != nil {
 		return r.Err("")
 	}
-	if l.Pwd == model.Pwd {
-		return r.Ok()
+	pwd := md5.Enc(l.Pwd, l.Acc)
+	if pwd == model.Pwd {
+		token, err := jwt.GenerateToken(model.Pwd, model.Acc)
+		if err != nil {
+			return r.Err("令牌生成错误")
+		}
+		return r.Ok().WidthData(token)
 	}
 	return r.Err("账号密码错误")
 }

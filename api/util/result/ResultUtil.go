@@ -1,6 +1,9 @@
 package result
 
-import "net/http"
+import (
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
 
 type Result struct {
 	Code int         `json:"code"`
@@ -33,4 +36,8 @@ func (r *Result) WidthData(data interface{}) *Result {
 		Msg:  r.Msg,
 		Data: data,
 	}
+}
+
+func (r *Result) Json(c *gin.Context) {
+	c.JSON(http.StatusOK, r)
 }

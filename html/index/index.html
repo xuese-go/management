@@ -1,12 +1,64 @@
-{{define "page/index/index.html"}}
+{{define "index/index.html"}}
     <!DOCTYPE html>
-    <html lang="en">
+    <html lang="zh-CN" class="translated-ltr">
     <head>
-        <meta charset="UTF-8">
-        <title>Title</title>
-    </head>
-    <body>
-    111111
-    </body>
-    </html>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>登录</title>
+
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="/static/plugins/fontawesome-free/css/all.min.css">
+        <!-- icheck bootstrap -->
+        <link rel="stylesheet" href="/static/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+        <!-- Theme style -->
+        <link rel="stylesheet" href="/static/dist/css/adminlte.min.css">
+    <body class="login-page" style="min-height: 466px;">
+    <div class="login-box">
+        <!-- /.login-logo -->
+        <div class="card card-outline card-primary">
+            <div class="card-header text-center">
+                <a href="#" class="h1"><b>登 录</b></a>
+            </div>
+            <div class="card-body">
+
+                <form id="form-login" action="#" method="post">
+                    <div class="input-group mb-3">
+                        <input type="email" class="form-control" placeholder="账号" name="acc" value="123456@qq.com">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-envelope"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input type="password" class="form-control" placeholder="密码" name="pwd" value="123456">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary btn-block">登入</button>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+    <!-- /.login-box -->
+
+    <!-- jQuery -->
+    <script src="/static/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="/static/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="/static/dist/js/adminlte.min.js"></script>
+
+    <script src="/static/js/json/json.js"></script>
+    <script src="/static/js/login/login.js"></script>
 {{end}}

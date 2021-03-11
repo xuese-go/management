@@ -10,6 +10,9 @@ import (
 func TokenMiddle(c *gin.Context) {
 
 	p := "/page"
+	p1 := "/static"
+	p2 := "/favicon"
+	p3 := "/api/login"
 	path := c.Request.URL.Path
 
 	if path == "/" {
@@ -17,17 +20,14 @@ func TokenMiddle(c *gin.Context) {
 		return
 	}
 
-	if strings.HasPrefix(path, p) {
+	if strings.HasPrefix(path, p) || strings.HasPrefix(path, p1) || strings.HasPrefix(path, p2) || strings.HasPrefix(path, p3) {
 		c.Next()
 		return
 	}
 
 	token := c.Request.Header.Get("auth")
 	if token == "" {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"msg":  "登录超时，请从新登录",
-			"data": "logout",
-		})
+		c.JSON(http.StatusInternalServerError, "登录超时，请从新登录")
 		c.Abort()
 	}
 
